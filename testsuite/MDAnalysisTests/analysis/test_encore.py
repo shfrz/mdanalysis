@@ -43,9 +43,6 @@ import MDAnalysis.analysis.align as align
 import MDAnalysis.analysis.encore.confdistmatrix as confdistmatrix
 
 
-def function(x):
-    return x**2
-
 class TestEncore(object):
     @pytest.fixture(scope='class')
     def ens1_template(self):
@@ -120,8 +117,12 @@ class TestEncore(object):
 inconsistent results")
 
     @pytest.mark.xfail(os.name == 'nt',
+                       strict=True,
                        reason="Not yet supported on Windows.")
     def test_parallel_calculation(self):
+
+        def function(x):
+            return x**2
 
         arguments = [tuple([i]) for i in np.arange(0,100)]
 
@@ -461,7 +462,7 @@ class TestEncoreClustering(object):
     def test_clustering_AffinityPropagationNative_direct(self, ens1):
         method = encore.AffinityPropagationNative()
         distance_matrix = encore.get_distance_matrix(ens1)
-        cluster_assignment = method(distance_matrix)
+        cluster_assignment, details = method(distance_matrix)
         expected_value = 7
         assert len(set(cluster_assignment)) == expected_value, \
                      "Unexpected result: {0}".format(cluster_assignment)
@@ -470,7 +471,7 @@ class TestEncoreClustering(object):
         pytest.importorskip('sklearn')
         method = encore.AffinityPropagation()
         distance_matrix = encore.get_distance_matrix(ens1)
-        cluster_assignment = method(distance_matrix)
+        cluster_assignment, details = method(distance_matrix)
         expected_value = 7
         assert len(set(cluster_assignment)) == expected_value, \
                      "Unexpected result: {0}".format(cluster_assignment)
@@ -482,7 +483,7 @@ class TestEncoreClustering(object):
         coordinates = ens1.trajectory.timeseries(order='fac')
         coordinates = np.reshape(coordinates,
                                  (coordinates.shape[0], -1))
-        cluster_assignment = method(coordinates)
+        cluster_assignment, details = method(coordinates)
         assert len(set(cluster_assignment)) == clusters, \
                      "Unexpected result: {0}".format(cluster_assignment)
 
@@ -490,7 +491,7 @@ class TestEncoreClustering(object):
         pytest.importorskip('sklearn')
         method = encore.DBSCAN(eps=0.5, min_samples=2)
         distance_matrix = encore.get_distance_matrix(ens1)
-        cluster_assignment = method(distance_matrix)
+        cluster_assignment, details = method(distance_matrix)
         expected_value = 2
         assert len(set(cluster_assignment)) == expected_value, \
                      "Unexpected result: {0}".format(cluster_assignment)

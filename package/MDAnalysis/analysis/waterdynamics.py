@@ -455,7 +455,7 @@ from six.moves import range, zip_longest
 
 import numpy as np
 import MDAnalysis.analysis.hbonds
-from MDAnalysis.lib.log import ProgressBar
+from MDAnalysis.lib.log import ProgressMeter
 
 
 class HydrogenBondLifetimes(object):
@@ -808,9 +808,11 @@ class WaterOrientationalRelaxation(object):
 
     def _selection_serial(self, universe, selection_str):
         selection = []
-        for ts in ProgressBar(universe.trajectory, verbose=True,
-                              total=universe.trajectory.n_frames):
+        pm = ProgressMeter(universe.trajectory.n_frames,
+                           interval=10, verbose=True)
+        for ts in universe.trajectory:
             selection.append(universe.select_atoms(selection_str))
+            pm.echo(ts.frame)
         return selection
 
     @staticmethod
@@ -981,9 +983,11 @@ class AngularDistribution(object):
 
     def _selection_serial(self, universe, selection_str):
         selection = []
-        for ts in ProgressBar(universe.trajectory, verbose=True,
-                              total=universe.trajectory.n_frames):
+        pm = ProgressMeter(universe.trajectory.n_frames,
+                           interval=10, verbose=True)
+        for ts in universe.trajectory:
             selection.append(universe.select_atoms(selection_str))
+            pm.echo(ts.frame)
         return selection
 
 
@@ -1121,9 +1125,11 @@ class MeanSquareDisplacement(object):
 
     def _selection_serial(self, universe, selection_str):
         selection = []
-        for ts in ProgressBar(universe.trajectory, verbose=True,
-                              total=universe.trajectory.n_frames):
+        pm = ProgressMeter(universe.trajectory.n_frames,
+                           interval=10, verbose=True)
+        for ts in universe.trajectory:
             selection.append(universe.select_atoms(selection_str))
+            pm.echo(ts.frame)
         return selection
 
     def run(self, **kwargs):
